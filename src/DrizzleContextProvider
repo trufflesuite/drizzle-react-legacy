@@ -1,7 +1,7 @@
 // 1. Import drizzle, drizzle-react, and your contract artifacts.
 import React, { Component } from "react";
 import { Drizzle, generateStore } from "drizzle";
-import { DrizzleContext } from "drizzle-react";
+import { DrizzleContext } from "./";
 import PropTypes from "prop-types";
 
 class DrizzleContextProvider extends Component {
