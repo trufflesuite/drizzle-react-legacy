@@ -18,16 +18,20 @@ export const useDrizzleState = mapState => {
   const [state, setState] = useState(mapState(drizzle.store.getState()))
   const stateRef = useRef(state)
   useEffect(
-    () =>
-      drizzle.store.subscribe(
-        debounce(() => {
-          const newState = mapState(drizzle.store.getState())
-          if (!shallowequal(stateRef.current, newState)) {
-            stateRef.current = newState
-            setState(newState)
-          }
-        })
-      ),
+    () => {
+      const debouncedHandler = debounce(() => {
+        const newState = mapState(drizzle.store.getState())
+        if (!shallowequal(stateRef.current, newState)) {
+          stateRef.current = newState
+          setState(newState)
+        }
+      })
+      const unsubscribe = drizzle.store.subscribe(debouncedHandler)
+      return () => {
+        unsubscribe()
+        debouncedHandler.clear()
+      }
+    },
     [drizzle.store]
   )
   return state
@@ -74,11 +78,11 @@ export const DrizzleProvider = ({ children, drizzle }) => {
   )
   const useCacheSend = useCallback(
     (contractName, methodName) => {
-      const [stackIDs, setStackIDs] = useState([])
       const drizzleState = useDrizzleState(drizzleState => ({
         transactionStack: drizzleState.transactionStack,
         transactions: drizzleState.transactions
       }))
+      const [stackIDs, setStackIDs] = useState([])
       const transactions = stackIDs.map(
         stackID =>
           drizzleState.transactions[
