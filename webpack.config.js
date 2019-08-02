@@ -1,10 +1,12 @@
 const path = require('path');
+const webpack = require('webpack');
 
-process.env.BABEL_ENV = 'development';
+const ENV = process.env.NODE_ENV;
+process.env.BABEL_ENV = ENV;
 
-module.exports = {
+const config = {
+  mode: ENV || 'production',
   entry: './src/index.js',
-  devtool: 'eval-source-map',
   output: {
     filename: 'drizzle-react.js',
     library: 'drizzle-react',
@@ -12,16 +14,15 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.(js)$/,
-      include: path.resolve(__dirname, 'src'),
-      loader: 'babel-loader',
-      options: {
-        presets: ['react'],
-        plugins: [require('babel-plugin-transform-class-properties'), require('babel-plugin-transform-object-rest-spread')]
-      }
+      use: 'babel-loader',
+      include: path.resolve(__dirname, 'src')
     }]
   },
+  plugins: [
+    new webpack.optimize.AggressiveMergingPlugin()
+  ],
   externals: [
     'drizzle',
     'prop-types',
@@ -29,3 +30,21 @@ module.exports = {
     'redux'
   ]
 };
+
+switch (ENV) {
+  case 'production':
+    config.devtool = false;
+    config.optimization = { minimize: true };
+    break;
+  case 'development':
+    config.devtool = 'source-map';
+    break;
+  case 'test':
+    config.devtool = 'source-map';
+    delete config.entry;
+    break;
+  default:
+    break;
+}
+
+module.exports = config;
