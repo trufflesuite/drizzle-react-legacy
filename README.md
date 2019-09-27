@@ -1,3 +1,5 @@
+**DEPRECATION NOTICE** This repository has been deprecated in favor of: https://github.com/trufflesuite/drizzle
+
 # drizzle-react
 
 Requires React 0.14+
