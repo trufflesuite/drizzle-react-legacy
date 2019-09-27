@@ -303,7 +303,7 @@ import { drizzleReactHooks } from 'drizzle-react'
 export default () => {
   const {
     drizzle,
-    useCacheCall
+    useCacheCall,
     useCacheEvents,
     useCacheSend
   } = drizzleReactHooks.useDrizzle()
